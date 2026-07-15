@@ -418,18 +418,18 @@ async function resetSession() {
 ═══════════════════════════════════════════════════════════════════════════ */
 
 function handleQuickAction(prompt) {
-  if (!State.sessionActive && State.startupIdea) {
-    // User has typed an idea but not sent — start session with quick action
-    sendMessage(prompt);
-  } else if (State.sessionActive) {
+  if (State.sessionActive) {
     sendMessage(prompt);
   } else {
-    // Populate chat input and focus
-    if (DOM.chatInput) {
-      DOM.chatInput.value = prompt;
-      DOM.chatInput.dispatchEvent(new Event("input"));
-      DOM.chatInput.focus();
+    // We are on the landing screen. Validate that an idea has been entered.
+    const idea = DOM.startupIdeaInput ? DOM.startupIdeaInput.value.trim() : "";
+    if (!idea) {
+      showToast("Please describe your startup idea first!", "warning");
+      DOM.startupIdeaInput && DOM.startupIdeaInput.focus();
+      return;
     }
+    setStartupIdeaContext(idea);
+    sendMessage(prompt);
   }
   BS.offcanvas.hide();
 }

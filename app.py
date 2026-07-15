@@ -128,26 +128,58 @@ except Exception as e:
 
 
 # ---------------------------------------------------------------------------
-# Conversation Memory Helpers
+# Conversation Memory Helpers (Filesystem-based to bypass 4KB Cookie limit)
 # ---------------------------------------------------------------------------
+import json
+
 MAX_HISTORY_TURNS = 12  # Keep last 12 turns (6 user + 6 assistant) in context
+SESSION_DIR = "/tmp/ventureforge_sessions"
+os.makedirs(SESSION_DIR, exist_ok=True)
+
+
+def get_session_path(sid: str) -> str:
+    """Get absolute path to session JSON file."""
+    return os.path.join(SESSION_DIR, f"{sid}.json")
 
 
 def get_conversation_history() -> list:
-    """Retrieve conversation history from the current Flask session."""
-    return session.get("conversation_history", [])
+    """Retrieve conversation history from server-side session storage."""
+    sid = session.get("session_id")
+    if not sid:
+        return []
+    path = get_session_path(sid)
+    if os.path.exists(path):
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return []
+    return []
 
 
 def append_to_history(role: str, content: str) -> None:
-    """Append a new message to the session conversation history."""
+    """Append a new message to the server-side session conversation history."""
+    sid = session.get("session_id")
+    if not sid:
+        return
     history = get_conversation_history()
-    history.append({"role": role, "content": content, "timestamp": datetime.utcnow().isoformat()})
-    # Trim to the most recent MAX_HISTORY_TURNS turns to manage context length
+    # Use standard timezone-aware datetime replacement if utcnow is deprecated, or keep utcnow
+    history.append({
+        "role": role,
+        "content": content,
+        "timestamp": datetime.now().isoformat()
+    })
+    # Trim to context window size
     if len(history) > MAX_HISTORY_TURNS * 2:
-        # Always keep the first message (initial idea) + recent turns
         history = history[:1] + history[-(MAX_HISTORY_TURNS * 2 - 1):]
-    session["conversation_history"] = history
-    session.modified = True
+    
+    path = get_session_path(sid)
+    try:
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(history, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        logger.error(f"Failed to write session file: {e}")
+
 
 
 def build_chat_messages(user_message: str) -> list:
@@ -290,7 +322,14 @@ def reset_session():
     Reset the conversation history for the current session.
     Starts a fresh co-founder session without requiring re-login.
     """
-    session["conversation_history"] = []
+    sid = session.get("session_id")
+    if sid:
+        path = get_session_path(sid)
+        if os.path.exists(path):
+            try:
+                os.remove(path)
+            except Exception:
+                pass
     session["session_id"] = str(uuid.uuid4())
     session.modified = True
     logger.info("Session reset.")
