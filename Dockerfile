@@ -19,5 +19,5 @@ COPY . .
 # Expose port 8000 (Koyeb and Render default port)
 EXPOSE 8000
 
-# Run the Flask app using Gunicorn on port 8000
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
+# Run the Flask app using Gunicorn on port 8000 with a 120-second timeout
+CMD ["gunicorn", "--timeout", "120", "--bind", "0.0.0.0:8000", "app:app"]
