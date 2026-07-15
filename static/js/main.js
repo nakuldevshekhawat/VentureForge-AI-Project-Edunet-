@@ -594,6 +594,21 @@ function attachEventListeners() {
     });
   }
 
+  // ── Hero: Capability Chips (Direct Action Prompts) ─────────────────────
+  document.querySelectorAll(".capability-chip-btn").forEach((chip) => {
+    chip.addEventListener("click", () => {
+      const idea = DOM.startupIdeaInput ? DOM.startupIdeaInput.value.trim() : "";
+      if (!idea) {
+        showToast("Please describe your startup idea first!", "warning");
+        DOM.startupIdeaInput && DOM.startupIdeaInput.focus();
+        return;
+      }
+      const prompt = chip.dataset.prompt;
+      setStartupIdeaContext(idea);
+      sendMessage(prompt);
+    });
+  });
+
   // ── Hero: Explore Samples Button ──────────────────────────────────────
   if (DOM.exploreSamplesBtn) {
     DOM.exploreSamplesBtn.addEventListener("click", () => {

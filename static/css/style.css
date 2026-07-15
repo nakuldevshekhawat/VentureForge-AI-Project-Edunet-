@@ -479,13 +479,15 @@ body {
   font-weight: 500;
   color: var(--text-secondary);
   transition: all var(--transition);
-  cursor: default;
+  cursor: pointer;
 }
 
 .chip:hover {
   border-color: var(--ibm-blue-60);
   color: var(--ibm-blue-60);
   background: var(--ibm-blue-10);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
 }
 
 [data-theme="dark"] .chip:hover {
