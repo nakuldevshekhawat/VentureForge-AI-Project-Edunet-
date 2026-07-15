@@ -266,4 +266,28 @@ QUICK_ACTIONS = [
         "prompt": "Conduct a thorough market opportunity analysis including TAM/SAM/SOM estimation, customer persona, and competitor landscape.",
         "color": "danger",
     },
+    {
+        "id": "revenue_model",
+        "label": "⚙️ Revenue Model",
+        "prompt": "Propose a detailed revenue model with pricing tiers, monetization strategies, and unit economics.",
+        "color": "warning",
+    },
+    {
+        "id": "marketing_plan",
+        "label": "🎯 Marketing Plan",
+        "prompt": "Propose a 6-month marketing and go-to-market strategy for acquiring my first 100 paying customers.",
+        "color": "success",
+    },
+    {
+        "id": "competitors",
+        "label": "🔍 Competitor Moat",
+        "prompt": "Analyze potential competitors, identify entry barriers, and suggest a unique moat for my startup.",
+        "color": "primary",
+    },
+    {
+        "id": "risk_assessment",
+        "label": "⚠️ Risk Assessment",
+        "prompt": "Identify key technical, operational, and market risks for my startup and propose mitigation plans.",
+        "color": "danger",
+    },
 ]

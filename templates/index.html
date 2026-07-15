@@ -298,7 +298,7 @@
         </div>
 
         <!-- Quick actions row -->
-        <div class="quick-actions-row d-none d-md-flex">
+        <div class="quick-actions-row d-flex">
           {% for action in quick_actions %}
           <button class="qa-chip quick-action-btn" data-prompt="{{ action.prompt }}">
             {{ action.label }}
