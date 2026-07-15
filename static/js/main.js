@@ -648,6 +648,28 @@ function attachEventListeners() {
     });
   });
 
+  // ── Sidebar & Mobile: Analysis Modules (Direct Action Prompts) ──────────
+  document.querySelectorAll(".analysis-module-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const idea = DOM.startupIdeaInput ? DOM.startupIdeaInput.value.trim() : "";
+      if (!idea && !State.sessionActive) {
+        showToast("Please describe your startup idea first!", "warning");
+        DOM.startupIdeaInput && DOM.startupIdeaInput.focus();
+        return;
+      }
+      
+      const moduleName = btn.dataset.module;
+      const prompt = `Provide a detailed, structured analysis for my startup focusing specifically on: ${moduleName}.`;
+      
+      if (!State.sessionActive) {
+        setStartupIdeaContext(idea);
+      }
+      
+      BS.offcanvas.hide(); // Hide mobile menu if open
+      sendMessage(prompt);
+    });
+  });
+
   // ── Hero: Explore Samples Button ──────────────────────────────────────
   if (DOM.exploreSamplesBtn) {
     DOM.exploreSamplesBtn.addEventListener("click", () => {

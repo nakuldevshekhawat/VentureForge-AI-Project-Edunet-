@@ -105,6 +105,17 @@
       {{ action.label }}
     </button>
     {% endfor %}
+
+    <!-- Mobile Analysis Modules -->
+    <hr class="my-3" />
+    <p class="text-muted small mb-2 fw-600">Analysis Modules</p>
+    <div class="modules-grid mb-3">
+      {% for module in analysis_modules %}
+      <button class="module-tag analysis-module-btn" data-module="{{ module }}">
+        {{ module }}
+      </button>
+      {% endfor %}
+    </div>
   </div>
 </div>
 
@@ -167,7 +178,9 @@
       </div>
       <div class="modules-grid">
         {% for module in analysis_modules %}
-        <span class="module-tag">{{ module }}</span>
+        <button class="module-tag analysis-module-btn" data-module="{{ module }}">
+          {{ module }}
+        </button>
         {% endfor %}
       </div>
     </div>

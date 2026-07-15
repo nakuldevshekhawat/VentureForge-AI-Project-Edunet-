@@ -333,7 +333,19 @@ body {
   border-radius: var(--radius-pill);
   border: 1px solid var(--border-color);
   white-space: nowrap;
-  cursor: default;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.module-tag:hover {
+  background: var(--ibm-blue-10);
+  border-color: var(--ibm-blue-60);
+  color: var(--ibm-blue-60);
+  transform: translateY(-1px) scale(1.05);
+}
+
+[data-theme="dark"] .module-tag:hover {
+  background: rgba(229,9,20,.12);
 }
 
 .sidebar-footer {
