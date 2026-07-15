@@ -16,8 +16,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application files
 COPY . .
 
-# Expose port 7860 (Hugging Face Spaces default port)
-EXPOSE 7860
+# Expose port 8000 (Koyeb and Render default port)
+EXPOSE 8000
 
-# Run the Flask app using Gunicorn on port 7860
-CMD ["gunicorn", "--bind", "0.0.0.0:7860", "app:app"]
+# Run the Flask app using Gunicorn on port 8000
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app:app"]
