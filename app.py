@@ -309,7 +309,10 @@ def chat():
         logger.error(f"Error generating AI response: {e}", exc_info=True)
         return jsonify({
             "success": False,
-            "error": f"Error generating AI response: {str(e)}",
+            "error": (
+                "An error occurred while generating your startup blueprint. "
+                "Please check your IBM watsonx.ai credentials and try again."
+            ),
         }), 500
 
 
