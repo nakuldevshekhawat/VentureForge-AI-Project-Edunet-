@@ -1,0 +1,26 @@
+# VentureForge AI – From Vision to Venture
+# Python Dependencies
+# =============================================================================
+
+# Web Framework
+Flask==3.0.3
+Werkzeug==3.0.3
+
+# IBM watsonx.ai SDK
+ibm-watsonx-ai==1.1.2
+
+# Environment variable management
+python-dotenv==1.0.1
+
+# HTTP requests (used by IBM SDK)
+requests==2.32.3
+
+# Security & CORS
+Flask-Cors==4.0.1
+
+# Markdown to HTML rendering (optional — fallback used if not available)
+Markdown==3.6
+
+# Utilities
+python-dateutil==2.9.0
+gunicorn

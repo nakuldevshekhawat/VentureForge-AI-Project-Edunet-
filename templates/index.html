@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="VentureForge AI – From Vision to Venture. AI-powered startup blueprint generator using IBM Granite." />
+  <meta name="author" content="VentureForge AI" />
+  <title>VentureForge AI – From Vision to Venture</title>
+
+  <!-- Bootstrap 5.3 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <!-- Custom Styles -->
+  <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>" />
+</head>
+<body>
+
+<!-- ============================================================
+     NAVIGATION BAR
+============================================================ -->
+<nav class="navbar navbar-expand-lg ventureforge-navbar sticky-top">
+  <div class="container-fluid px-3 px-lg-4">
+
+    <!-- Brand -->
+    <a class="navbar-brand d-flex align-items-center gap-2" href="/">
+      <div class="brand-icon">
+        <i class="bi bi-rocket-takeoff-fill"></i>
+      </div>
+      <div>
+        <span class="brand-name">VentureForge</span>
+        <span class="brand-suffix">AI</span>
+        <div class="brand-tagline">From Vision to Venture</div>
+      </div>
+    </a>
+
+    <!-- Nav items (desktop) -->
+    <div class="d-none d-lg-flex align-items-center gap-3 ms-auto">
+      <!-- AI Status Badge -->
+      <div class="ai-status-badge {% if ai_ready %}status-online{% else %}status-offline{% endif %}">
+        <span class="status-dot"></span>
+        <span class="status-text">
+          {% if ai_ready %}IBM Granite Active{% else %}Configure API Key{% endif %}
+        </span>
+      </div>
+
+      <!-- Model Badge -->
+      <span class="model-badge">
+        <i class="bi bi-cpu-fill me-1"></i>IBM Granite
+      </span>
+
+      <!-- Theme Toggle -->
+      <button class="theme-toggle btn" id="themeToggle" title="Toggle dark/light mode">
+        <i class="bi bi-moon-stars-fill" id="themeIcon"></i>
+      </button>
+
+      <!-- New Session -->
+      <button class="btn btn-outline-primary btn-sm" id="newSessionBtn" title="Start a new session">
+        <i class="bi bi-plus-circle me-1"></i>New Session
+      </button>
+    </div>
+
+    <!-- Mobile menu toggle -->
+    <button class="navbar-toggler border-0 ms-auto" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
+      <i class="bi bi-layout-sidebar-reverse fs-5"></i>
+    </button>
+  </div>
+</nav>
+
+<!-- ============================================================
+     MOBILE OFFCANVAS MENU
+============================================================ -->
+<div class="offcanvas offcanvas-end ventureforge-offcanvas" tabindex="-1" id="mobileMenu">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title">
+      <i class="bi bi-rocket-takeoff-fill me-2 text-primary"></i>VentureForge AI
+    </h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+  </div>
+  <div class="offcanvas-body">
+    <div class="d-flex flex-column gap-3">
+      <div class="ai-status-badge {% if ai_ready %}status-online{% else %}status-offline{% endif %} w-100 justify-content-center">
+        <span class="status-dot"></span>
+        <span>{% if ai_ready %}IBM Granite Active{% else %}API Key Required{% endif %}</span>
+      </div>
+      <button class="btn btn-outline-primary" id="newSessionBtnMobile">
+        <i class="bi bi-plus-circle me-2"></i>New Session
+      </button>
+      <button class="btn btn-outline-secondary" id="themeToggleMobile">
+        <i class="bi bi-moon-stars-fill me-2" id="themeIconMobile"></i>Toggle Theme
+      </button>
+    </div>
+
+    <!-- Mobile Quick Actions -->
+    <hr class="my-3" />
+    <p class="text-muted small mb-2 fw-600">Quick Actions</p>
+    {% for action in quick_actions %}
+    <button class="btn btn-outline-{{ action.color }} btn-sm w-100 mb-2 text-start quick-action-btn"
+            data-prompt="{{ action.prompt }}">
+      {{ action.label }}
+    </button>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- ============================================================
+     MAIN LAYOUT
+============================================================ -->
+<div class="app-container">
+
+  <!-- ========================================================
+       LEFT SIDEBAR
+  ======================================================== -->
+  <aside class="sidebar d-none d-lg-flex flex-column">
+
+    <!-- Sidebar Header -->
+    <div class="sidebar-section">
+      <div class="sidebar-header-text">
+        <i class="bi bi-lightning-charge-fill text-warning me-2"></i>
+        Quick Actions
+      </div>
+      <div class="d-flex flex-column gap-2 mt-2">
+        {% for action in quick_actions %}
+        <button class="btn btn-{{ action.color }} btn-sm text-start quick-action-btn"
+                data-prompt="{{ action.prompt }}">
+          {{ action.label }}
+        </button>
+        {% endfor %}
+      </div>
+    </div>
+
+    <hr class="sidebar-divider" />
+
+    <!-- Sample Ideas -->
+    <div class="sidebar-section flex-grow-1 overflow-auto">
+      <div class="sidebar-header-text">
+        <i class="bi bi-lightbulb-fill text-warning me-2"></i>
+        Sample Ideas
+      </div>
+      <div class="d-flex flex-column gap-2 mt-2" id="sampleIdeasList">
+        {% for idea in sample_ideas %}
+        <div class="sample-idea-card" data-idea="{{ idea.description }}" title="{{ idea.description }}">
+          <div class="d-flex align-items-start gap-2">
+            <span class="idea-icon">{{ idea.icon }}</span>
+            <div>
+              <div class="idea-title">{{ idea.title }}</div>
+              <div class="idea-category text-muted">{{ idea.category }}</div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <hr class="sidebar-divider" />
+
+    <!-- Analysis Modules -->
+    <div class="sidebar-section">
+      <div class="sidebar-header-text mb-2">
+        <i class="bi bi-grid-3x3-gap-fill text-primary me-2"></i>
+        Analysis Modules
+      </div>
+      <div class="modules-grid">
+        {% for module in analysis_modules %}
+        <span class="module-tag">{{ module }}</span>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Session Info -->
+    <div class="sidebar-footer">
+      <div class="d-flex justify-content-between align-items-center">
+        <span class="text-muted small">
+          <i class="bi bi-chat-dots me-1"></i>
+          <span id="turnCounter">0</span> turns
+        </span>
+        <span class="text-muted small" id="sessionBadge">
+          <i class="bi bi-shield-check me-1"></i>Secure
+        </span>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ========================================================
+       CHAT AREA (MAIN)
+  ======================================================== -->
+  <main class="chat-area d-flex flex-column">
+
+    <!-- Hero / Welcome Screen -->
+    <div class="hero-screen" id="heroScreen">
+      <div class="hero-content text-center">
+
+        <!-- Animated Logo -->
+        <div class="hero-logo">
+          <div class="logo-orbit">
+            <div class="orbit-ring ring-1"></div>
+            <div class="orbit-ring ring-2"></div>
+            <div class="logo-core">
+              <i class="bi bi-rocket-takeoff-fill"></i>
+            </div>
+          </div>
+        </div>
+
+        <h1 class="hero-title">
+          VentureForge <span class="text-primary">AI</span>
+        </h1>
+        <p class="hero-subtitle">From Vision to Venture</p>
+        <p class="hero-description">
+          Your AI-powered startup co-founder. Transform your innovative idea into a
+          <strong>complete, investor-ready startup blueprint</strong> in minutes — powered by
+          <span class="ibm-badge">IBM Granite</span> on watsonx.ai.
+        </p>
+
+        <!-- Capability chips -->
+        <div class="capability-chips">
+          <span class="chip"><i class="bi bi-graph-up-arrow me-1"></i>Market Analysis</span>
+          <span class="chip"><i class="bi bi-people-fill me-1"></i>Customer Personas</span>
+          <span class="chip"><i class="bi bi-currency-dollar me-1"></i>Revenue Models</span>
+          <span class="chip"><i class="bi bi-diagram-3-fill me-1"></i>SWOT Analysis</span>
+          <span class="chip"><i class="bi bi-map-fill me-1"></i>90-Day Roadmap</span>
+          <span class="chip"><i class="bi bi-mic-fill me-1"></i>Elevator Pitch</span>
+          <span class="chip"><i class="bi bi-bank2 me-1"></i>Funding Guide</span>
+          <span class="chip"><i class="bi bi-file-earmark-text-fill me-1"></i>Executive Summary</span>
+        </div>
+
+        <!-- Startup Idea Input -->
+        <div class="idea-input-container mt-4">
+          <div class="idea-input-wrapper">
+            <div class="idea-input-label">
+              <i class="bi bi-lightbulb-fill text-warning me-2"></i>
+              Start with your startup idea
+            </div>
+            <textarea
+              id="startupIdeaInput"
+              class="form-control idea-textarea"
+              placeholder="Describe your startup idea in a few sentences… e.g., 'An AI-powered platform that helps rural farmers get real-time crop advisory using satellite data and IoT sensors.'"
+              rows="3"
+            ></textarea>
+            <div class="d-flex gap-2 mt-3 justify-content-center flex-wrap">
+              <button class="btn btn-primary btn-lg px-4" id="analyzeIdeaBtn">
+                <i class="bi bi-magic me-2"></i>Analyze My Idea
+              </button>
+              <button class="btn btn-outline-secondary btn-lg px-4" id="exploreSamplesBtn">
+                <i class="bi bi-collection me-2"></i>Explore Samples
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Not configured warning -->
+        {% if not ai_ready %}
+        <div class="alert alert-warning mt-4 mx-auto config-alert" role="alert">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          <strong>IBM watsonx.ai not configured.</strong>
+          Copy <code>.env.example</code> to <code>.env</code> and add your
+          <code>IBM_API_KEY</code> and <code>WATSONX_PROJECT_ID</code>.
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Chat Messages Container -->
+    <div class="chat-messages d-none" id="chatMessages">
+      <!-- Messages are injected here by JavaScript -->
+    </div>
+
+    <!-- Chat Input Bar -->
+    <div class="chat-input-bar" id="chatInputBar">
+      <div class="chat-input-inner">
+
+        <!-- Context pill (shows startup idea context) -->
+        <div class="context-pill d-none" id="contextPill">
+          <i class="bi bi-bookmark-fill me-1"></i>
+          <span id="contextPillText">No idea set</span>
+          <button class="context-clear-btn" id="clearContextBtn" title="Clear idea context">
+            <i class="bi bi-x"></i>
+          </button>
+        </div>
+
+        <!-- Input row -->
+        <div class="input-row">
+          <textarea
+            id="chatInput"
+            class="chat-textarea"
+            placeholder="Ask VentureForge AI anything about your startup… or type a question."
+            rows="1"
+            maxlength="4000"
+          ></textarea>
+          <button class="send-btn" id="sendBtn" title="Send message" disabled>
+            <i class="bi bi-send-fill"></i>
+          </button>
+        </div>
+
+        <!-- Quick actions row -->
+        <div class="quick-actions-row d-none d-md-flex">
+          {% for action in quick_actions %}
+          <button class="qa-chip quick-action-btn" data-prompt="{{ action.prompt }}">
+            {{ action.label }}
+          </button>
+          {% endfor %}
+        </div>
+
+        <div class="input-footer">
+          <span class="char-counter"><span id="charCount">0</span>/4000</span>
+          <span class="powered-by">
+            Powered by <strong>IBM Granite</strong> on watsonx.ai
+          </span>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+</div><!-- /app-container -->
+
+<!-- ============================================================
+     MODALS
+============================================================ -->
+
+<!-- Export / Copy Modal -->
+<div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content ventureforge-modal">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exportModalLabel">
+          <i class="bi bi-file-earmark-arrow-down me-2 text-primary"></i>Export Blueprint
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="exportContent" class="export-content"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+        <button class="btn btn-primary" id="copyExportBtn">
+          <i class="bi bi-clipboard me-2"></i>Copy All
+        </button>
+        <button class="btn btn-success" id="downloadExportBtn">
+          <i class="bi bi-download me-2"></i>Download .txt
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- New Session Confirmation Modal -->
+<div class="modal fade" id="newSessionModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content ventureforge-modal">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="bi bi-arrow-clockwise me-2 text-warning"></i>Start New Session?
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        This will clear your current conversation and start fresh. Your blueprint will be lost unless exported.
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-warning" id="confirmNewSession">
+          <i class="bi bi-arrow-clockwise me-2"></i>Start Fresh
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notifications -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
+  <div id="ventureforgeToast" class="toast align-items-center border-0" role="alert">
+    <div class="d-flex">
+      <div class="toast-body" id="toastMessage">Action completed.</div>
+      <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SCRIPTS
+============================================================ -->
+<!-- Bootstrap 5.3 -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Marked.js (Markdown parser) -->
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
+<!-- DOMPurify (XSS sanitization) -->
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.5/dist/purify.min.js"></script>
+<!-- Custom JS -->
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+<!-- Inject server-side data to JS -->
+<script id="ventureforge-server-data" type="application/json">
+  {
+    "aiReady": {{ ai_ready | tojson }},
+    "sampleIdeas": {{ sample_ideas | tojson }},
+    "quickActions": {{ quick_actions | tojson }}
+  }
+</script>
+
+</body>
+</html>
