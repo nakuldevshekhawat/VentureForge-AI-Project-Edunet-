@@ -609,11 +609,27 @@ function attachEventListeners() {
     });
   }
 
+  // ── Brand Logo Click (Home Navigation) ───────────────────────────────
+  const navbarBrand = document.querySelector(".navbar-brand");
+  if (navbarBrand) {
+    navbarBrand.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (State.sessionActive) {
+        BS.newSessionModal.show();
+      } else {
+        resetToHero();
+      }
+    });
+  }
+
   // ── Quick Action Buttons ───────────────────────────────────────────────
   document.querySelectorAll(".quick-action-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       const prompt = btn.dataset.prompt;
-      if (prompt) handleQuickAction(prompt);
+      if (prompt) {
+        BS.offcanvas.hide(); // Close offcanvas menu on mobile
+        handleQuickAction(prompt);
+      }
     });
   });
 
@@ -621,7 +637,10 @@ function attachEventListeners() {
   document.querySelectorAll(".sample-idea-card").forEach((card) => {
     card.addEventListener("click", () => {
       const idea = card.dataset.idea;
-      if (idea) handleSampleIdea(idea);
+      if (idea) {
+        BS.offcanvas.hide(); // Close offcanvas menu on mobile
+        handleSampleIdea(idea);
+      }
     });
   });
 
@@ -630,6 +649,7 @@ function attachEventListeners() {
     if (btn) {
       btn.addEventListener("click", () => {
         if (State.sessionActive) {
+          BS.offcanvas.hide(); // Close offcanvas menu first to avoid backdrop locking
           BS.newSessionModal.show();
         } else {
           resetSession();
