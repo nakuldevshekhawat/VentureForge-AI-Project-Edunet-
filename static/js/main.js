@@ -554,12 +554,51 @@ function showToast(message, type = "info") {
   const colorMap = {
     success: "#22c55e",
     error: "#ef4444",
-    warning: "#f59e0b",
+    warning: "#ef4444", // Force red for warnings/errors as requested
     info: "#3b82f6",
   };
 
-  DOM.ventureforgeToast.style.borderLeft = `4px solid ${colorMap[type] || colorMap.info}`;
-  DOM.toastMessage.textContent = message;
+  // 1. Force background color to be opposite of active theme
+  const theme = State.currentTheme || "light";
+  const closeBtn = DOM.ventureforgeToast.querySelector(".btn-close");
+
+  if (theme === "dark") {
+    // Dark mode active -> toast should be light themed
+    DOM.ventureforgeToast.style.backgroundColor = "#ffffff";
+    DOM.ventureforgeToast.style.color = "#141414";
+    DOM.ventureforgeToast.style.border = "1px solid #d2d2d7";
+    DOM.ventureforgeToast.style.boxShadow = "0 8px 32px rgba(0,0,0,.15)";
+    if (closeBtn) closeBtn.classList.remove("btn-close-white");
+  } else {
+    // Light mode active -> toast should be dark themed
+    DOM.ventureforgeToast.style.backgroundColor = "#181818";
+    DOM.ventureforgeToast.style.color = "#ffffff";
+    DOM.ventureforgeToast.style.border = "1px solid #2f2f2f";
+    DOM.ventureforgeToast.style.boxShadow = "0 8px 32px rgba(0,0,0,.3)";
+    if (closeBtn) closeBtn.classList.add("btn-close-white");
+  }
+
+  // 2. Setup message and emoji prefix if warning/error
+  let displayMessage = message;
+  if (type === "warning" || type === "error") {
+    // Add red accent border to left
+    DOM.ventureforgeToast.style.borderLeft = `5px solid ${colorMap[type]}`;
+    
+    // Add disclaimer emoji if not present
+    if (!displayMessage.includes("🚨") && !displayMessage.includes("⚠️")) {
+      displayMessage = `🚨 ${displayMessage}`;
+    }
+    
+    // Increase size and weight
+    DOM.toastMessage.style.fontSize = "1.05rem";
+    DOM.toastMessage.style.fontWeight = "600";
+  } else {
+    DOM.ventureforgeToast.style.borderLeft = `4px solid ${colorMap[type] || colorMap.info}`;
+    DOM.toastMessage.style.fontSize = "0.85rem";
+    DOM.toastMessage.style.fontWeight = "normal";
+  }
+
+  DOM.toastMessage.textContent = displayMessage;
   BS.toast.show();
 }
 
